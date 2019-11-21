@@ -35,7 +35,8 @@ def compress( inputFile, outputFile ):
   # integer.
 
   img = netpbm.imread( inputFile ).astype('uint8')
-  
+
+  baseDict = genDict(img)
   # Compress the image
   #
   # REPLACE THIS WITH YOUR OWN CODE TO FILL THE 'outputBytes' ARRAY.
@@ -79,6 +80,23 @@ def compress( inputFile, outputFile ):
   sys.stderr.write( 'Compression factor: %.2f\n' % (inSize/float(outSize)) )
   sys.stderr.write( 'Compression time:   %.2f seconds\n' % (endTime - startTime) )
   
+def genDict(img):
+  myDict = {}
+  ind = 0
+  width = img.shape[0]
+  height = img.shape[1]
+  print(img[50,50])
+  for x in range(width):
+    for y in range(height):
+      key = tuple(img[x,y])
+      if key in myDict:
+        pass
+      else:
+        myDict[key] = ind
+        ind += 1
+
+  print(len(myDict))
+  return myDict
 
 
 # Uncompress an image
@@ -130,8 +148,11 @@ def uncompress( inputFile, outputFile ):
 #
 # where {flag} is one of 'c' or 'u' for compress or uncompress and
 # either filename can be '-' for standard input or standard output.
-
-
+inputFile = open('images/barbara.pnm','rb')
+outputFile = open('barbarac.pnm','wb')
+compress(inputFile,outputFile)
+#TODO UNCOMMENT THIS to reset command capabilities
+"""
 if len(sys.argv) < 4:
   sys.stderr.write( 'Usage: main.py c|u {input image filename} {output image filename}\n' )
   sys.exit(1)
@@ -167,3 +188,4 @@ elif sys.argv[1] == 'u':
 else:
   sys.stderr.write( 'Usage: main.py c|u {input image filename} {output image filename}\n' )
   sys.exit(1)
+"""
