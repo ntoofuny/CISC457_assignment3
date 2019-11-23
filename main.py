@@ -40,7 +40,10 @@ def compress( inputFile, outputFile ):
 
   img = netpbm.imread( inputFile ).astype('uint8')
   channels = 0
+  #gen dictionary for pixel values to 255
   baseDict = genDict()
+
+  #get number of channels
   if len(img.shape) == 2:
     channels = 1
   elif len(img.shape) == 3:
@@ -50,47 +53,56 @@ def compress( inputFile, outputFile ):
     return
 
   imgArray = []
-  
+  # if 1 channel, loop through every pixel
   if (channels == 1):
     for x in range(img.shape[0]):
       for y in range(img.shape[1]):
-
+        
+        #initial pixel, no predition
         if(x == 0 and y == 0):
           imgArray.append(img[0,0])
 
         else:
+          # make prediction using previous pixel
           if(x == 0):
             imgArray.append(img[x, y] - img[x, y-1])
           else:
             imgArray.append(img[x, y] - img[x-1, y])
 
-
+  # image has 3 channels, loop through all pixels and channels
   else:
     for x in range(img.shape[0]):
       for y in range(img.shape[1]):
         for c in range(img.shape[2]):
 
+          #Initial pixel no prediction
           if(x == 0 and y ==0):
             imgArray.append(img[0, 0, c])
 
           else:
+            # Create prediction based on previous pixel values 
             if(x == 0):
               imgArray.append(img[x, y, c] - img[x, y-1, c])
             else:
               imgArray.append(img[x, y, c] - img[x-1, y, c])
 
+  # The number of values that will be in the output file
   numBytes = img.shape[0] * img.shape[1] * channels
 
+
+  #LZW Compression
   s = ()
   s = imgArray[0]
   nextDictIndex = len(baseDict)
 
+  # loop through all the predicted values
   for i in range(1, numBytes):
 
     x = imgArray[i]
     if s+x in baseDict:
       s = s+x
     else:
+      #Push s to output and add s+x to the dictionary
       np.append(outputBytes, np.uint16(baseDict[s]))
       baseDict[s+x] = nextDictIndex
       nextDictIndex += 1
