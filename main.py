@@ -34,9 +34,79 @@ def compress( inputFile, outputFile ):
   # is 'uint8', meaning that each component is an 8-bit unsigned
   # integer.
 
-  img = netpbm.imread( inputFile ).astype('uint8')
+  startTime = time.time()
+ 
+  outputBytes = np.array([],dtype=np.uint16)
 
-  baseDict = genDict(img)
+  img = netpbm.imread( inputFile ).astype('uint8')
+  channels = 0
+  baseDict = genDict()
+  if len(img.shape) == 2:
+    channels = 1
+  elif len(img.shape) == 3:
+    channels = 3
+  else:
+    print("Unknown image format")
+    return
+
+  imgArray = []
+  
+  if (channels == 1):
+    for x in range(img.shape[0]):
+      for y in range(img.shape[1]):
+
+        if(x == 0 and y == 0):
+          imgArray.append(img[0,0])
+
+        else:
+          if(x == 0):
+            imgArray.append(img[x, y] - img[x, y-1])
+          else:
+            imgArray.append(img[x, y] - img[x-1, y])
+
+
+  else:
+    for x in range(img.shape[0]):
+      for y in range(img.shape[1]):
+        for c in range(img.shape[2]):
+
+          if(x == 0 and y ==0):
+            imgArray.append(img[0, 0, c])
+
+          else:
+            if(x == 0):
+              imgArray.append(img[x, y, c] - img[x, y-1, c])
+            else:
+              imgArray.append(img[x, y, c] - img[x-1, y, c])
+
+  numBytes = img.shape[0] * img.shape[1] * channels
+
+  s = ()
+  s = imgArray[0]
+  nextDictIndex = len(baseDict)
+
+  for i in range(1, numBytes):
+
+    x = imgArray[i]
+    if s+x in baseDict:
+      s = s+x
+    else:
+      np.append(outputBytes, np.uint16(baseDict[s]))
+      baseDict[s+x] = nextDictIndex
+      nextDictIndex += 1
+      s = x
+
+  np.append(outputBytes, np.uint16(baseDict[s]))
+
+
+
+
+    
+
+
+
+          
+
   # Compress the image
   #
   # REPLACE THIS WITH YOUR OWN CODE TO FILL THE 'outputBytes' ARRAY.
@@ -48,15 +118,6 @@ def compress( inputFile, outputFile ):
   # instead of img[y,x,1].  You'll need two pieces of similar code:
   # one piece for the single-channel case and one piece for the
   # multi-channel case.
-
-  startTime = time.time()
- 
-  outputBytes = bytearray()
-
-  for y in range(img.shape[0]):
-    for x in range(img.shape[1]):
-      for c in range(img.shape[2]):
-        outputBytes.append( img[y,x,c] )
 
   endTime = time.time()
 
@@ -79,24 +140,14 @@ def compress( inputFile, outputFile ):
   sys.stderr.write( 'Output size:        %d bytes\n' % outSize )
   sys.stderr.write( 'Compression factor: %.2f\n' % (inSize/float(outSize)) )
   sys.stderr.write( 'Compression time:   %.2f seconds\n' % (endTime - startTime) )
-  
-def genDict(img):
-  myDict = {}
-  ind = 0
-  width = img.shape[0]
-  height = img.shape[1]
-  print(img[50,50])
-  for x in range(width):
-    for y in range(height):
-      key = tuple(img[x,y])
-      if key in myDict:
-        pass
-      else:
-        myDict[key] = ind
-        ind += 1
 
-  print(len(myDict))
+
+def genDict():
+  myDict = {}
+  for i in range(256):
+    myDict[(i)] = i
   return myDict
+
 
 
 # Uncompress an image
@@ -148,10 +199,10 @@ def uncompress( inputFile, outputFile ):
 #
 # where {flag} is one of 'c' or 'u' for compress or uncompress and
 # either filename can be '-' for standard input or standard output.
-inputFile = open('images/barbara.pnm','rb')
-outputFile = open('barbarac.pnm','wb')
+inputFile = open('images/noise.pnm','rb')
+outputFile = open('noisec.pnm','wb')
 compress(inputFile,outputFile)
-#TODO UNCOMMENT THIS to reset command capabilities
+#ODO UNCOMMENT THIS to reset command capabilities
 """
 if len(sys.argv) < 4:
   sys.stderr.write( 'Usage: main.py c|u {input image filename} {output image filename}\n' )
