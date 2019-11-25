@@ -200,36 +200,29 @@ def uncompress(inputFile, outputFile):
     except StopIteration:
         pass
 
-        # delimiter when we have the dictionary
-        def genDict():
-            myDict = {}
-            for i in range(-256, 256):
-                myDict[str(i)] = np.uint16(256 + i)
-            return myDict
+# delimiter when we have the dictionary
+    codeDict = genDict()
 
-            codeDict = genDict()
-            dict = {}  # -255 to 255
-            list = range(-255, 256)
-            dict.toKeys(list, 0)
+    print("YOLLAAA : "+str(img[0,0]))
 
-            old = img[0, 0, 0]
-            old_trans = codeDict[img[0, 0, 0]]
-            # loop
-            print(img[0, 0, 0])
-            for y in range(rows):
-                for x in range(columns):
-                    new = img[y, x]
-            if new not in codeDict.key():
-                s = old_trans
+    old_trans = codeDict[str(img[0, 0])]
+    # loop
+    print(img[0, 0])
+    for y in range(rows):
+        for x in range(columns):
+            new = img[y, x]
+    if new not in codeDict.key():
+        s = old_trans
 
-            else:
-                s = codeDict[new]
-            print(str(s))
-            c = s.split(',')[0]
-            codeDict[len(codeDict) + 1] = old + c
-            old = new
+    else:
+        s = codeDict[new]
+    print(str(s))
+    c = s.split(',')[0]
+    codeDict[len(codeDict) + 1] = old + c
+    old = new
+    print(str(codeDict))
 
-        endTime = time.time()
+    endTime = time.time()
 
     # Output the image
 
