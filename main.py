@@ -183,11 +183,20 @@ def uncompress(inputFile, outputFile):
 
     img = np.empty([rows, columns], dtype=np.uint8)
 
+    def pack(tup):
+        return (tup[1] << 8) | tup[0]
+
+    startTime = time.time()
+
+    img = np.empty([rows, columns], dtype=np.uint8)
+
     byteIter = iter(inputBytes)
     for y in range(rows):
         for x in range(columns):
-            img[y, x] = byteIter.next()
-            print(img[y, x])
+            val1 = byteIter.next()
+            val2 = byteIter.next()
+            tup = (val1, val2)
+            img[x, y] = pack(tup)
 
         # delimiter when we have the dictionary
         def genDict():
