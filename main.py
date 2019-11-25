@@ -167,10 +167,15 @@ def uncompress(inputFile, outputFile):
     list = []
     # Read the rows, columns, and channels.
     list = [int(x) for x in inputFile.readline().split()]
-    print("LIST: "+ str(len(list)))
-    rows = list[0]
-    columns = list[1]
+    if len(list) == 3:
+        rows = list[0]
+        columns = list[1]
+        channels = list[2]
     #if len(list) == 2:
+
+    else:
+        rows = list[0]
+        columns = list[1]
 
     #else:
         #rows, columns, channels = [int(x) for x in inputFile.readline().split()]
@@ -183,6 +188,7 @@ def uncompress(inputFile, outputFile):
     # REPLACE THIS WITH YOUR OWN CODE TO CONVERT THE 'inputBytes' ARRAY INTO AN IMAGE IN 'img'.
 
     startTime = time.time()
+
 
     img = np.empty([rows, columns], dtype=np.uint8)
 
@@ -209,20 +215,22 @@ def uncompress(inputFile, outputFile):
     print(img[0, 0])
     for y in range(rows):
         for x in range(columns):
-            new = img[x, y]
-            if str(new) not in codeDict:
-                s = old_trans
-                s = str(s)+str(c)
+            for c in range(channels):
+                new = img[x, y, c]
+                if str(new) not in codeDict:
+                    s = old_trans
+                    s = str(s)+str(c)
 
-            else:
-                s = codeDict[str(new)]
-                print("THE S: " + str(s))
-            c = int(str(s)[:1])
-            codeDict[str(len(codeDict) + 1)] = int(str(old) + str(c))
-            old = new
+                else:
+                    s = codeDict[str(new)]
+                    #print("THE S: " + str(s))
+                c = int(str(s)[:1])
+                codeDict[str(len(codeDict) + 1)] = int(str(old) + str(c))
+                old = new
 
-            print(str(codeDict))
-            endTime = time.time()
+                #print(str(codeDict))
+                print(str(len(codeDict)))
+                endTime = time.time()
 
             # Output the image
 
