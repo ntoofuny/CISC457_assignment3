@@ -162,8 +162,14 @@ def uncompress(inputFile, outputFile):
         sys.exit(1)
 
     # Read the rows, columns, and channels.
+    list = []
+    # Read the rows, columns, and channels.
+    list = [int(x) for x in inputFile.readline().split()]
+    rows = list[0]
+    columns = list[1]
 
-    rows, columns, channels = [int(x) for x in inputFile.readline().split()]
+    # if [int(x) for x in inputFile.readline().split()]
+    # type([int(float(x)) for x in inputFile.readline().split()])
 
     # Read the raw bytes.
 
@@ -175,33 +181,44 @@ def uncompress(inputFile, outputFile):
 
     startTime = time.time()
 
-    img = np.empty([rows, columns, channels], dtype=np.uint8)
+    img = np.empty([rows, columns], dtype=np.uint8)
 
     byteIter = iter(inputBytes)
     for y in range(rows):
         for x in range(columns):
-            for c in range(channels):
-                img[y, x, c] = byteIter.next()
-                print(img[y,x,c])
-#delimiter when we have the dictionary
-    def genDict():
-        myDict = {}
-        for i in range(-256, 256):
-            myDict[str(i)] = np.uint16(256 + i)
-        return myDict
-    codeDict = genDict()
-    codeDict = dict.toKeys(list, 0)
-    print(codeDict)
-    old = img[0,0,0]
-    s = codeDict[img[0,0,0]]
-    #loop
-    for y in range(rows):
-        for x in range(columns):
-            for c in range(channels):
-                new = img[y,x,c]
-                #if new is not in the string table
+            img[y, x] = byteIter.next()
+            print(img[y, x])
 
-    endTime = time.time()
+        # delimiter when we have the dictionary
+        def genDict():
+            myDict = {}
+            for i in range(-256, 256):
+                myDict[str(i)] = np.uint16(256 + i)
+            return myDict
+
+            codeDict = genDict()
+            dict = {}  # -255 to 255
+            list = range(-255, 256)
+            dict.toKeys(list, 0)
+
+            old = img[0, 0, 0]
+            old_trans = codeDict[img[0, 0, 0]]
+            # loop
+            print(img[0, 0, 0])
+            for y in range(rows):
+                for x in range(columns):
+                    new = img[y, x]
+            if new not in codeDict.key():
+                s = old_trans
+
+            else:
+                s = codeDict[new]
+            print(str(s))
+            c = s.split(',')[0]
+            codeDict[len(codeDict) + 1] = old + c
+            old = new
+
+        endTime = time.time()
 
     # Output the image
 
