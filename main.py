@@ -151,6 +151,8 @@ def genDict():
         myDict[str(i)] = np.uint16(256 + i)
     return myDict
 
+def pack(tup):
+    return (tup[1] << 8) | tup[0]
 
 # Uncompress an image
 
@@ -165,12 +167,13 @@ def uncompress(inputFile, outputFile):
     list = []
     # Read the rows, columns, and channels.
     list = [int(x) for x in inputFile.readline().split()]
+    print("LIST: "+ str(len(list)))
     rows = list[0]
     columns = list[1]
+    #if len(list) == 2:
 
-    # if [int(x) for x in inputFile.readline().split()]
-    # type([int(float(x)) for x in inputFile.readline().split()])
-
+    #else:
+        #rows, columns, channels = [int(x) for x in inputFile.readline().split()]
     # Read the raw bytes.
 
     inputBytes = bytearray(inputFile.read())
@@ -182,10 +185,6 @@ def uncompress(inputFile, outputFile):
     startTime = time.time()
 
     img = np.empty([rows, columns], dtype=np.uint8)
-
-    def pack(tup):
-        return (tup[1] << 8) | tup[0]
-
 
     try:
         while True:
@@ -204,30 +203,30 @@ def uncompress(inputFile, outputFile):
     codeDict = genDict()
 
     print("YOLLAAA : "+str(img[0,0]))
-
+    old = img[0, 0]
     old_trans = codeDict[str(img[0, 0])]
     # loop
     print(img[0, 0])
     for y in range(rows):
         for x in range(columns):
-            new = img[y, x]
-    if new not in codeDict.key():
-        s = old_trans
+            new = img[x, y]
+            if str(new) not in codeDict:
+                s = old_trans
+                s = str(s)+str(c)
 
-    else:
-        s = codeDict[new]
-    print(str(s))
-    c = s.split(',')[0]
-    codeDict[len(codeDict) + 1] = old + c
-    old = new
-    print(str(codeDict))
+            else:
+                s = codeDict[str(new)]
+                print("THE S: " + str(s))
+            c = int(str(s)[:1])
+            codeDict[str(len(codeDict) + 1)] = int(str(old) + str(c))
+            old = new
 
-    endTime = time.time()
+            print(str(codeDict))
+            endTime = time.time()
 
-    # Output the image
+            # Output the image
 
     netpbm.imsave(outputFile, img)
-
     sys.stderr.write('Uncompression time: %.2f seconds\n' % (endTime - startTime))
 
 
